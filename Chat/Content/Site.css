@@ -1,0 +1,264 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Authorization block */
+
+.auth-block {
+    background-color: #dde;
+    border: 2px solid #333;
+    font-size: 1.5vw;
+    height: 4.5vw; min-height: 30px;
+    padding-top: .5vw;
+    text-align: center;
+}
+    .auth-block input[type=password], .auth-block input[name=UserLogin] {
+        font-size: 1.5vw;
+        height: 2.5vw;
+        width: 10vw;
+    }
+    .auth-block span, .auth-block input[type=button] {
+        margin: 0 15px;
+    }
+    /* Index - sections view */
+.section-block {
+    border: 3px solid green;
+    border-radius: 7px;
+    margin-top: 15px;
+}
+
+    .section-block p {
+        background-color: lightgreen;
+        border-radius: 4px 4px 0 0;
+        color: green;
+        display:flex;
+        font-weight: bold;
+        margin: 0 0px 3px 0;
+        padding: 2px 10px;
+    }
+
+.title-header {
+    width: 51%
+}
+.author-header {
+    width: 15%
+}
+.posts-cnt-header {
+    width: 15%
+}
+.last-post-header {
+    width: 19%
+}
+
+.theme-block {
+    display: flex;
+    padding: 2px 0px 0px 5px;
+}
+.theme-title, .theme-author, .theme-posts, .theme-last {
+    border:  1px solid lightgreen;
+    margin: 0px 0 2px -1px;
+    padding: 5px;
+}
+.theme-title {
+    width: 50%;
+}
+.theme-author {
+    width: 15%;
+}
+.theme-posts {
+    width: 15%;
+}
+.theme-last {
+    width: 20%;
+}
+
+
+/* About - Posts by theme */
+.add-post-form {
+    display: block;
+    border: 1px solid cornflowerblue;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+textarea[name="Message"] {
+    height: 100px;
+    width: 50%;
+}
+
+.post-block {
+    background-color: azure;
+    border: 1px solid lightSteelBlue;
+    height: 130px;
+    margin: 10px 15px;
+    position: relative;
+}
+
+    .post-block cite {
+        display: none;
+    }
+
+.post-user-info {
+    background-color: aliceblue;
+    float: left;
+    margin: 10px 20px 0 2px;
+    width: 20%;
+}
+    .post-user-info b {
+        display: block;
+        text-align: center;
+    }
+    .post-user-info img {
+        display: block;
+        margin:auto;
+        max-height: 90px;
+        max-width: 90%;
+    }
+.post-message {
+    padding: 10px 0 0 10px;    
+}
+    .post-message span {
+        display: inline-block;
+        max-height: 60px;
+        overflow: auto;
+        width: 75%;
+    }
+
+.post-date {
+    position: absolute;
+    bottom: 5px;
+    left: 22%;
+}
+
+.post-controls {
+    position: absolute;
+    bottom: 5px;
+    opacity:0;
+    right: 5%;
+    transition:  .4s;
+}
+.post-block:hover > .post-controls {
+    opacity:1;
+}
+
+.post-control {
+    background-repeat: no-repeat;
+    background-position: 5px 1px;
+    border-radius: 3px;
+    color: snow;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 7px;
+    height: 30px;
+    padding-top: 20px;
+    text-align: center;
+    width: 30px;
+}
+
+.post-control-hide {
+    background-color: #e94346;
+    background-image: url("/Images/delete20.png");
+    background-position-x: 6px;
+}
+.post-control-pin {
+    background-color: #22b27e;
+    background-image: url("/Images/pin_unpin20.png");
+}
+.post-control-reply {
+    background-color: #3893f1;
+    background-image: url("/Images/reply20.png");
+}
+
+.del-cite {
+    background-image: url("/Images/nax25.png");
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+    height: 25px;
+    width:  25px;
+}
+
+.cite-post-hidden {
+    display: none;
+}
+
+.cite-post-visible {
+    background-color: moccasin;
+    font-size: small;
+    height: 37px;
+    margin-left: 20%;
+    overflow: auto;
+    padding-left: 5px;
+    width: 75%;
+}
+
+.personal-control-edit {
+    background-color: #22a2a2;
+    background-image: url("/Images/Edit20.png");
+}
+
+.smiley-block {
+    border: 1px solid #aaa;
+    display: inline-block;
+    height: 100px;
+    margin-bottom: 5px;
+    overflow: auto;
+    vertical-align: bottom;
+    width:  200px;
+}
+
+.smiley-img {
+    cursor: pointer;
+    display:inline-block;
+    font-size: 30px;
+    margin: 5px;
+    vertical-align: bottom;
+}
+
+.smiley-img img {
+    margin: 5px;
+    z-index: -1;
+}
+
+#cabinetName,
+#cabinetEmail,
+#cabinetStatus {
+    display: inline-block;
+    min-height: 20px;
+    min-width: 30px;
+}
+
+input[name="ShownData"]:checked + label {
+    font-weight: 900;
+    color: red;
+}
+
+#saveUserEdit {
+    display: none;
+}
+
+.add-section-input {
+    background-color: cornflowerblue;
+}

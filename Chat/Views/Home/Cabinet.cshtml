@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewBag.Title = "Cabinet";
+}
+
+<h2>Личный кабинет</h2>
+
+Логин: @ViewBag.User.Login <br />
+Обновить пароль: <input type="password" id="PassHash" /><br/>
+Имя: <span id="cabinetName">@ViewBag.User.RealName</span> <br />
+Эл.почта: <span id="cabinetEmail">@ViewBag.User.Email</span> <br />
+
+Отображается в сообщениях:<br />
+<input type="radio" name="ShownData" value="0" id="shown0" @(ViewBag.User.ShownData == 0 || ViewBag.User.ShownData == null ? "checked" : "") />
+<label for="shown0">Логин</label><br />
+<input type="radio" name="ShownData" value="1" id="shown1" @(ViewBag.User.ShownData == 1 ? "checked" : "")/>
+<label for="shown1">Имя</label><br />
+<input type="radio" name="ShownData" value="2" id="shown2" @(ViewBag.User.ShownData == 2 ? "checked" : "")/>
+<label for="shown2">Эл.почта</label><br />
+
+Статус: <span id="cabinetStatus">@ViewBag.User.Status</span> <br />
+Дата регистрации: @ViewBag.User.Registered <br />
+Последний вход: @ViewBag.User.LastLogin <br />
+Аватар: <br />
+@{
+    String ava = ViewBag.User.AvatarFile;
+    if (String.IsNullOrEmpty(ava)
+    || !File.Exists(Server.MapPath("/") + "/avatar_files/" + ava))
+    { ava = "no_ava.jpg"; }
+}
+<img src="/avatar_files/@ava" />
+<br/>
+Сменить аватар 
+<input type="file" name="AvatarFile" accept="image/*"/>
+
+<input type="button" id="saveUserEdit" value="Сохранить изменения" />
+
+@if(ViewBag.CabinetMessage != null)
+{
+<script>
+    setTimeout(() => { alert(` @ViewBag.CabinetMessage `) }, 300);
+</script>
+}

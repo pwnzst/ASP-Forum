@@ -1,0 +1,74 @@
+﻿@{
+                /**/
+
+                ViewBag.Title = "Home Page";
+}
+
+@if (Session["Error"] != null)
+{
+    <script>alert('@Session["Error"]')</script>
+    Session["Error"] = null;
+}
+
+@foreach (var sd in ViewBag.SectionData)
+{
+    <div class="section-block">
+        <p title="@sd.section.Description">
+            <span class="title-header">
+                @sd.section.Title
+            </span>
+            <span class="author-header">Автор</span>
+            <span class="posts-cnt-header">Сообщений</span>
+            <span class="last-post-header">Последний ответ</span>
+        </p>
+        @foreach (var d in sd.data)
+                {
+            <div class="theme-block">
+                <div class="theme-title" title="@d.theme.Description">
+                    <a href="/Home/About/@d.theme.Id">@d.theme.Title</a>
+                </div>
+                <div class="theme-author"
+                     @if (d.theme.Id_Author.Equals(Session["authUserId"])) { WriteLiteral("style='font-weight:700'"); }>
+                    @d.authorShown
+                </div>
+               
+                <div class="theme-posts"
+                     style='font-size:@( 10 + d.postsCnt / 2 )px; color:rgb(@(50+d.postsCnt*20),50,50)'>
+                    @d.postsCnt
+                </div>
+                <div class="theme-last">
+                    <a class="lastPostStyle" href="/Home/About/@d.theme.Id#last">
+                        @(d.lastPost?.CreateDT ?? "--")
+                        <b>@d.lastPostAuthorShown</b>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+
+                                }
+        <!-- Блок добавления новой темы -->
+        @if (Session["authUserId"] != null)  // Проверка на вход пользователя
+        {
+            <hr />
+            <p class="add-new-title">Создать:</p>
+            <div class="section-block">
+                <p>
+                    Секция:
+                    <input list="sections" class="add-section-input" />
+                    <i id="newSectionDescription">Выберите раздел или впишите для создания нового</i>
+                </p>
+                Тема: <input class="add-theme-input" />
+                Описание: <input class="add-theme-description-input" />
+                <input type="button" value="Создать" class="add-theme-button" />
+            </div>
+
+            <datalist id="sections">
+                @foreach (var st in ViewBag.Section_Themes)
+                {
+                    <option>@st.section.Title</option>
+                }
+            </datalist>
+        }

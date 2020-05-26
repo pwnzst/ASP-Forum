@@ -1,0 +1,84 @@
+﻿
+@{
+    ViewBag.Title = "Users";
+}
+
+<h2>Управление пользователями</h2>
+
+<table border="1" cellspacing="0">
+
+        <tr>
+            <th>Активный</th>
+            <th>Ава</th>
+            <th>Логин</th>
+            <th>Имя</th>
+            <th>Статус</th>
+            <th>Почта</th>
+            <th>Отобр</th>
+            <th>Дата рег</th>
+            <th>Дата входа</th>
+            <th>Сообщений</th>
+            <th>Тем</th>
+            <th>Разделов</th>
+            <th>Последнее сообщение</th>
+            
+            <th>Индекс цитирования</th>
+        </tr>
+    @foreach (Chat.Models.UserAdminData udata in ViewBag.userAdminData)
+    {
+       
+            <tr>
+                <td><input type="checkbox"class="activeCB" 
+                           uid="@udata.user.Id"
+                           @(udata.isBan ? "" : "checked")/></td>
+                <td>
+                    @if (udata.user.AvatarFile.Equals(String.Empty))
+                { WriteLiteral("-"); }
+                else { WriteLiteral("<img style='height:120px'src='/avatar_files/" + udata.user.AvatarFile + "'/>"); }
+            </td>
+                <td>@udata.user.Login</td>
+                <td>@udata.user.RealName</td>
+                <td>@udata.user.Status</td>
+                <td>@udata.user.Email</td>
+                <td>@udata.shown</td>
+                <td>@udata.user.Registered</td>
+                <td>@udata.user.LastLogin</td>
+                <td>@udata.postCnt</td>
+                <td>@udata.themeCnt</td>
+                <td>@udata.secCnt</td>
+                <td>@if (udata.lastPost != null) {
+                    <span title="@udata.lastPost.Message">@udata.lastPost.Message.Substring(0,10)
+                    </span>
+                }</td>
+                
+                <td>@udata.cites</td>
+            </tr>
+      
+    }
+</table>
+
+<script>
+    //console.log("123"); 
+    document.addEventListener("DOMContentLoaded", function (e) {
+        
+        const acb = document.getElementsByClassName("activeCB");
+        for (let c of acb) {
+            c.onclick = activeCBClick;
+        }
+    });
+    activeCBClick = function(e) {
+        //alert((e.target.checked ? "разбанить": "забанить")+ e.target(getAttribute("uid")));
+        const status = e.target.checked ? "1" : "-1";
+        const uid = e.target.getAttribute("uid");
+        const x = new XMLHttpRequest();
+        const url = "/admin/activateuser?status=" + status + "&uid=" + uid;
+        x.open("GET", url, true);
+        console.log(url);
+        x.onreadystatechange=()=>{
+            if (x.readyState == 4) {
+                //alert(x.responseText);
+            }
+    }
+        x.send();
+    }
+</script>

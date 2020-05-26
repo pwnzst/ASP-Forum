@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Registration";
+}
+
+<h2>Registration</h2>
+
+<form method="POST" action="/Home/RegUser" enctype="multipart/form-data" >
+
+    <span>Login: </span><input type="text" name="Login" /><br/>
+    <span>Password: </span><input type="password" name="PassHash" /><br />
+    <span>Repeat: </span><input type="password" id="Repeat" /><br />
+    <span>Real Name: </span><input type="text" name="RealName" /><br />
+    <span>Email: </span><input type="email" name="Email" /><br />
+    <span>Shown data: </span><br />
+    <label><input type="radio" name="ShownData" value="0" />Login</label><br />
+    <label><input type="radio" name="ShownData" value="1" />Real name</label><br />
+    <label><input type="radio" name="ShownData" value="2" />Email</label><br />
+    <span>Avatar: </span><input type="file" name="AvatarFile" /><br />
+    <span>Status: </span><textarea name="Status"></textarea><br />
+    <input type="button" value="Send" onclick="SendClick(event)"/>
+</form>

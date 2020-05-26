@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title = "About";
+    var Theme = Chat.Models.ThemeUtil.GetTheme(ViewBag.Id_Theme);
+    var User = Chat.Models.UserUtil.GetUser(Convert.ToInt32(Session["authUserId"]));
+}
+
+@( Theme==null ? "Ошибка определения темы" : Theme.Title )
+
+@{int i = 0;  int n = ViewBag.Posts.Count;  
+}  
+
+@foreach ( Chat.Models.Post post in ViewBag.Posts )
+{
+    String ava;
+    String userShown;
+    Chat.Models.User user = Chat.Models.UserUtil.GetUser(post.Id_Author);
+    if (user == null)
+    {
+        ava = "no_ava.jpg";
+        userShown = "Удален из БД";
+    }
+    else
+    {
+        ava = user.AvatarFile;
+        if (String.IsNullOrEmpty(ava)
+        || !File.Exists(Server.MapPath("/") + "/avatar_files/" + ava))
+        { ava = "no_ava.jpg"; }
+
+        userShown = Chat.Models.UserUtil.GetUserShown(post.Id_Author);
+    }
+    <div class="post-block" @(++i == n ? "id=last":"")>
+        
+        <cite>@post.Id</cite>
+        <div class="post-user-info">
+            <img src="/avatar_files/@ava" />
+            <b>
+                @userShown
+            </b>
+       </div>
+      
+        <div class="post-message">
+            <div class="cite-post-@(post.Id_Cite==0 ? "hidden" : "visible")">
+                <b>@post.GetCiteAuthor():</b>
+                <i>@Html.Raw(Chat.Models.MessageUtils.ReplaceSmiley(post.GetCiteMessage()??""))</i>
+            </div>
+            <span>@Html.Raw(Chat.Models.MessageUtils.ReplaceSmiley(post.Message))</span>
+            <div class="post-date">@Chat.Utils.DateRu(post.CreateDT) </div>
+        </div>
+        <div class="post-controls">
+            @if (User != null && User.Id == post.Id_Author)
+            {
+                    <div class="post-control personal-control-edit">Edit</div>
+            }
+            <div class="post-control post-control-hide">Hide</div>
+            <div class="post-control post-control-pin">Pin</div>
+            <div class="post-control post-control-reply">Reply</div>
+        </div> 
+
+    </div>
+}
+
+    <form method="post" action="/Home/AddPost" class="add-post-form" id="post-form">
+        <p id="cite_msg"></p>
+        Сообщение: <textarea name="Message"></textarea>
+        <div class="smiley-block">
+            @foreach(var smiley in Chat.Models.Smiley.GetList())
+            {
+            <div class="smiley-img" combo="@smiley.Combo">
+                @Html.Raw( smiley.ReplTxt ??$"<img src='/images/{smiley.ReplImg}' style='width:30px' />" )
+            </div>
+            }
+        </div>
+        <br />
+        <input type="submit" value="Опубликовать" />
+        <input type="hidden" name="Id_Author"
+               value='@( User == null ? 0 : User.Id )' />
+        <input type="hidden" name="Id_Theme"
+               value='@ViewBag.Id_Theme' />
+        <input type="hidden" name="Id_Cite"
+               value='0' />
+        <input type="hidden" name="Id"
+               value='0' />
+    </form>
+
+@if (ViewBag.ErrMessage != null)
+{
+    <script>setTimeout(() => { alert('@ViewBag.ErrMessage') }, 1)</script>
+}
