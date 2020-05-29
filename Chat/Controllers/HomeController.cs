@@ -548,8 +548,6 @@ namespace Chat.Controllers
             //return sec_id.ToString();
         }
 
-
-
         public static bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
