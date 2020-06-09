@@ -1,0 +1,524 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Chat</name>
+    </assembly>
+    <members>
+        <member name="T:Chat.Controllers.AdminController">
+            <summary>
+            The <c>AdminController</c> class.
+            </summary>
+        </member>
+        <member name="F:Chat.Controllers.AdminController.chat">
+            <value> The value of Models.ChatContext chat</value>
+        </member>
+        <member name="M:Chat.Controllers.AdminController.Index">
+            <summary>
+            ActionResult Index
+            </summary>
+            <returns>View</returns>
+        </member>
+        <member name="M:Chat.Controllers.AdminController.Users">
+             <summary>
+             It's data ViewResult Users function, that provides all user data for administation panel
+             </summary>
+             <returns>View</returns>
+             <example>
+             <code>
+             foreach (var user in Models.ChatContext.Context.Users.ToList())
+                {
+                    userAdminData.Add(new Models.UserAdminData()
+                    {
+                         user = user,
+                         isBan = (user.LastLogin.GetValueOrDefault().Equals(DateTime.Parse(System.Configuration.ConfigurationManager.AppSettings["banDate"]))),
+                         shown = user.ShownData == 0 ? "Логин" :
+                         user.ShownData == 1 ? "Имя" : "Почта",
+                         postCnt = Models.UserUtil.GetPostCnt(user.Id),
+                         secCnt = Models.UserUtil.GetSectionsCnt(user.Id),
+                         themeCnt = Models.UserUtil.GetThemeCnt(user.Id),
+                         lastPost = Models.UserUtil.GetLastPost(user.Id),
+                         cites = Models.UserUtil.GetCommentsCnt(user.Id)
+            });
+            }
+                         ViewBag.userAdminData = userAdminData;
+             </code>
+             </example>
+        </member>
+        <member name="M:Chat.Controllers.AdminController.ActivateUser(System.Int32,System.Int32)">
+            <summary>
+            The function that provide information about users status (banned/not banned)
+            </summary>
+            <param name="status">status</param>
+            <param name="uid">user id</param>
+            <returns>Json</returns>
+        </member>
+        <member name="T:Chat.Controllers.HomeController">
+            <summary>
+            The main <c>HomeController</c> class. 
+            Contains all methods for back-end
+            </summary>
+            <remarks>
+            This class can auth, logout, addPost, addTheme, editUser etc.
+            </remarks>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.Index">
+            <summary>
+            This method is loading Index page with needed DATA
+            It checks if there are any sections/themes. If not - it adds "default" sections and themes and saves changes
+            </summary>
+            <returns>
+            nothing
+            </returns>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.Auth(Chat.Models.AuthData)">
+            <summary>
+            This method is an auth method that provides auth and if success - redirectToRoute
+            it checks if user is not banned and set his lastLogin to current time
+            and set sessionUserId to current user.Id
+            </summary>
+            <param name="authData">Authdata (login/pass) to auth</param>
+            <returns>RedirectToRoute to HomePage</returns>
+            <example>
+            <code>
+            user.LastLogin = DateTime.Now;
+            Models.ChatContext.Context.SaveChanges();
+            </code>
+            </example>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.Logout">
+            <summary>
+            This method is a logout method that redirects u to the homePage
+            it sets sessionUserId to null
+            then it redirects user to the homePage
+            </summary>
+            <returns>nothing</returns>
+            <example>
+            <code>
+             Session["authUserId"] = null;
+            </code>
+            </example>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.AddPost(Chat.Models.Post)">
+            <summary>
+            This method is an AddPost method that provides sending a post (message) if user is logged in.
+            it checkes if the user is not banned, if so - it checks for an empty post, post without theme, author
+            if everything is fine it adds Post to the database with the all data
+            else it sends the email if u are cited
+            </summary>
+            <param name="post">Post object</param>
+            <returns>redirectToRoute to the theme</returns>
+            <example>
+            <code>
+             post.CreateDT = DateTime.Now;
+              chat.Posts.Add(post);
+              chat.SaveChanges();
+            </code>
+            </example>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.Contact">
+            <summary>
+            Contact page method
+            </summary>
+            <returns>View</returns>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.Registration">
+            <summary>
+            Registration Page
+            </summary>
+            <returns>View</returns>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.RegUser(Chat.Models.User)">
+            <summary>
+            This method is for new user registration
+            it generates passHash for a password+salt and if all fields are filled it adds data to the database (creates new user)
+            </summary>
+            <param name="user">user that wants to register</param>
+            <returns>View</returns>
+            <example>
+            <code>
+            Models.ChatContext chat = new Models.ChatContext();
+            chat.Users.Add(user);
+            chat.SaveChanges();
+            </code>
+            </example>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.Cabinet">
+            <summary>
+            Cabinet page method
+            </summary>
+            <returns>View</returns>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.EditUser(Chat.Models.User)">
+            <summary>
+            This method provides user data editing.
+            it checkes if session[id] is not null.
+            and if new fields are not empty it allows to edit the user data.
+            </summary>
+            <param name="user">user itself</param>
+            <returns>RedirectToRoute to cabinet</returns>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.AddTheme(System.String,System.String,System.String,System.String)">
+            <summary>
+            This method provides adding themes to the new or existing section.
+            It returns errCode if there are any errors.
+            Then it adds needed section, theme and post itself
+            </summary>
+            <param name="section">section name</param>
+            <param name="theme">theme name</param>
+            <param name="description">description</param>
+            <param name="secDescription">second description</param>
+            <returns>errorCode if something is wrong or addTheme()</returns>
+            <example>
+            <code>
+            if (String.IsNullOrEmpty(section))     return "-1";
+            if (String.IsNullOrEmpty(theme))       return "-2";
+            if (Session["authUserId"] == null)     return "-3";
+            if (String.IsNullOrEmpty(description)) return "-4";
+            </code>
+            </example>
+        </member>
+        <member name="M:Chat.Controllers.HomeController.IsValidEmail(System.String)">
+            <summary>
+            This method is checking if an email is Valid
+            It checks if the email is notnullorWhiteSpace and checks for Regex.IsMatch in a try..catch section
+            </summary>
+            <param name="email">email itself</param>
+            <returns>the result (true/false)</returns>
+            <example>
+            <code>
+            if (string.IsNullOrWhiteSpace(email))
+                   return false;
+            </code>
+            </example>
+        </member>
+        <member name="T:Chat.Models.AuthData">
+            <summary>
+            The <c>AuthData</c> class
+            </summary>
+            <remarks>It contains authdata (login, password)</remarks>
+        </member>
+        <member name="P:Chat.Models.AuthData.UserLogin">
+            <value>Gets the value of User login.</value>
+        </member>
+        <member name="P:Chat.Models.AuthData.UserPassword">
+            <value>Gets the value of User password.</value>
+        </member>
+        <member name="T:Chat.Models.MessageUtils">
+            <summary>
+            The <c>MessageUtils</c> class
+            </summary>
+        </member>
+        <member name="M:Chat.Models.MessageUtils.ReplaceSmiley(System.String)">
+            <summary>
+            This method replaces txt to smiley image in the message
+            </summary>
+            <param name="msg">smiley text, for example ":)"</param>
+            <returns>replace result</returns>
+        </member>
+        <member name="T:Chat.Models.Post">
+            <summary>
+            The <c>Post</c> class
+            </summary>
+            <remarks>It contains all needed Post data such as Id, authorId, themeId etc. </remarks>
+        </member>
+        <member name="P:Chat.Models.Post.Id">
+            <value>Gets the value of Post Id.</value>
+        </member>
+        <member name="P:Chat.Models.Post.Id_Author">
+            <value>Gets the value of Post Autor Id.</value>
+        </member>
+        <member name="P:Chat.Models.Post.Id_Theme">
+            <value>Gets the value of Post Theme Id.</value>
+        </member>
+        <member name="P:Chat.Models.Post.Id_Cite">
+            <value>Gets the value of Post Cite Id.</value>
+        </member>
+        <member name="P:Chat.Models.Post.Message">
+            <value>Gets the value of Post Message.</value>
+        </member>
+        <member name="P:Chat.Models.Post.CreateDT">
+            <value>Gets the value of Post Creation datetime.</value>
+        </member>
+        <member name="M:Chat.Models.Post.GetCiteMessage">
+            <summary>
+            This method gets the cite message
+            </summary>
+            <returns>Cite message</returns>
+            <example>
+            <code>
+            return ChatContext.Context.Posts.Find(Id_Cite)?.Message;
+            </code>
+            </example>
+        </member>
+        <member name="M:Chat.Models.Post.GetCiteAuthor">
+            <summary>
+            This method gets the cite author
+            </summary>
+            <returns>Cite author</returns>
+            <example>
+            <code>
+            Post citedPost = ChatContext.Context.Posts.Find(Id_Cite);
+            if (citedPost == null)
+                 return "";
+            return UserUtil.GetUserShown(citedPost.Id_Author);
+            </code>
+            </example>
+        </member>
+        <member name="T:Chat.Models.Section">
+            <summary>
+            The <c>Section</c> class
+            </summary>
+            <remarks>It contains all section data</remarks>
+        </member>
+        <member name="P:Chat.Models.Section.Id">
+            <value>Gets the value of Section Id.</value>
+        </member>
+        <member name="P:Chat.Models.Section.Id_Author">
+            <value>Gets the value of Section Author Id.</value>
+        </member>
+        <member name="P:Chat.Models.Section.Title">
+            <value>Gets the value of Section Title.</value>
+        </member>
+        <member name="P:Chat.Models.Section.Description">
+            <value>Gets the value of Section Description.</value>
+        </member>
+        <member name="P:Chat.Models.Section.CreateDT">
+            <value>Gets the value of Section creation time.</value>
+        </member>
+        <member name="T:Chat.Models.Section_Themes">
+            <summary>
+            The <c>Section_Themes</c> class
+            </summary>
+        </member>
+        <member name="F:Chat.Models.Section_Themes.section">
+            <value>the section object</value>
+        </member>
+        <member name="F:Chat.Models.Section_Themes.themes">
+            <value>List of themes</value>
+        </member>
+        <!-- Проигнорирован некорректный комментарий XML для члена "M:Chat.Models.Section_Themes.#ctor" -->
+        <member name="T:Chat.Models.Smiley">
+            <summary>
+            The <c>Smiley</c> class
+            </summary>
+            It was created for smiley for the chat
+        </member>
+        <member name="P:Chat.Models.Smiley.Combo">
+            <value>Gets the value of text combo.</value>
+        </member>
+        <member name="P:Chat.Models.Smiley.ReplTxt">
+            <value>Gets the value of replace text.</value>
+        </member>
+        <member name="P:Chat.Models.Smiley.ReplImg">
+            <value>Gets the value of replace image.</value>
+        </member>
+        <member name="M:Chat.Models.Smiley.GetList">
+            <summary>
+            This function gets List of smiley.
+            It checkes if list is not null and adds to the list data (combo,ReplTxt,ReplImg).
+            </summary>
+            <returns>list</returns>
+            <example>
+            <code>
+            string path = System.AppDomain.CurrentDomain.BaseDirectory;
+            doc.Load(path + @"\App_Data\Smiley.xml");
+            foreach(XmlNode smiley in doc.GetElementsByTagName("smiley"))
+            {
+                 list.Add(new Smiley()
+                 {
+                        Combo = smiley.Attributes["Combo"].Value,
+                        ReplTxt = smiley.Attributes["ReplTxt"]?.Value,
+                        ReplImg = smiley.Attributes["ReplImg"]?.Value
+                 });
+             }
+            </code>
+            </example>
+        </member>
+        <member name="T:Chat.Models.Theme">
+            <summary>
+            The <c>Theme</c> class. 
+            </summary>
+            <remarks>It contains fields same as in database</remarks>
+        </member>
+        <member name="P:Chat.Models.Theme.Id">
+            <value>Gets the value of Theme Id.</value>
+        </member>
+        <member name="P:Chat.Models.Theme.Id_Author">
+            <value>Gets the value of Theme author Id.</value>
+        </member>
+        <member name="P:Chat.Models.Theme.Id_Section">
+            <value>Gets the value of Theme section Id.</value>
+        </member>
+        <member name="P:Chat.Models.Theme.Title">
+            <value>Gets the value of Theme Title.</value>
+        </member>
+        <member name="P:Chat.Models.Theme.Description">
+            <value>Gets the value of Theme Description.</value>
+        </member>
+        <member name="P:Chat.Models.Theme.CreateDT">
+            <value>Gets the value of Theme creationTime.</value>
+        </member>
+        <member name="T:Chat.Models.ThemeUtil">
+            <summary>
+            The <c>ThemeUtil</c> class. 
+            </summary>
+        </member>
+        <member name="F:Chat.Models.ThemeUtil.chat">
+            <value> The value of Models.ChatContext chat</value>
+        </member>
+        <member name="M:Chat.Models.ThemeUtil.GetTheme(System.Int32)">
+            <summary>
+            It gets the name of theme by Id.
+            It checks if chat is not null and finds needed theme by id.
+            </summary>
+            <param name="themeId">Id of the needed theme</param>
+            <returns>Theme theme that we need</returns>
+            <example>
+            <code>
+            if (chat == null) chat = new Models.ChatContext();
+            return chat.Themes.Find(themeId);
+            </code>
+            </example>
+        </member>
+        <member name="T:Chat.Models.User">
+            <summary>
+            The <c>User</c> class
+            </summary>
+            <remarks>It contains all user data such as id, login,passhash, passsalt etc.</remarks>
+        </member>
+        <member name="P:Chat.Models.User.Id">
+            <value>Gets the value of User Id.</value>
+        </member>
+        <member name="P:Chat.Models.User.Login">
+            <value>Gets the value of User Login.</value>
+        </member>
+        <member name="P:Chat.Models.User.PassHash">
+            <value>Gets the value of User PassHash.</value>
+        </member>
+        <member name="P:Chat.Models.User.PassSalt">
+            <value>Gets the value of User PassSalt.</value>
+        </member>
+        <member name="P:Chat.Models.User.ShownData">
+            <value>Gets the value of User ShownData.</value>
+        </member>
+        <member name="P:Chat.Models.User.RealName">
+            <value>Gets the value of User real name.</value>
+        </member>
+        <member name="P:Chat.Models.User.Status">
+            <value>Gets the value of User Status.</value>
+        </member>
+        <member name="P:Chat.Models.User.Email">
+            <value>Gets the value of User Email.</value>
+        </member>
+        <member name="P:Chat.Models.User.AvatarFile">
+            <value>Gets the value of User AvatarFile path</value>
+        </member>
+        <member name="P:Chat.Models.User.Registered">
+            <value>Gets the value of User Registered datetime.</value>
+        </member>
+        <member name="P:Chat.Models.User.LastLogin">
+            <value>Gets the value of User LastLogin.</value>
+        </member>
+        <member name="T:Chat.Models.UserUtil">
+            <summary>
+            The <c>UserUtil</c> class
+            </summary>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetUserShown(System.Int32)">
+            <summary>
+            It gets user shown. 
+            </summary>
+            <param name="userId">user id</param>
+            <returns>What is shown (login/name/email)</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetUser(System.Int32)">
+            <summary>
+            It gets user by his Id
+            </summary>
+            <param name="userId">user Id</param>
+            <returns>user</returns>
+            <example>
+            <code>
+            return Models.ChatContext.Context.Users.Find(userId);
+            </code></example>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetUser(Chat.Models.AuthData)">
+            <summary>
+            It gets user by his authData
+            </summary>
+            <param name="authData">user authData</param>
+            <returns>user</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetPostCnt(System.Int32)">
+            <summary>
+            It counts posts, where user is an author.
+            It creates a query to database to find out how many posts has created the user.
+            </summary>
+            <param name="userId">user id </param>
+            <returns>ammount of posts</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetThemeCnt(System.Int32)">
+            <summary>
+            It counts themes, where user is an author.
+            It creates a query to database to find out how many themes has created the user.
+            </summary>
+            <param name="userId">user id </param>
+            <returns>ammount of themes</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetSectionsCnt(System.Int32)">
+            <summary>
+            It counts sections, where user is an author.
+            It creates a query to database to find out how many sections has created the user.
+            </summary>
+            <param name="userId">user id </param>
+            <returns>ammount of sections</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetLastPost(System.Int32)">
+            <summary>
+            It gets the last post of the current user.
+            It creates a query to database to find out the last post that was created/sent by the user.
+            </summary>
+            <param name="userId">user id </param>
+            <returns>post</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.GetCommentsCnt(System.Int32)">
+            <summary>
+            It counts comments, that user has done.
+            It creates a query to database to find out how many comments has done the user.
+            </summary>
+            <param name="userId">user id </param>
+            <returns>ammount of comments</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.IsBanned(System.Int32)">
+            <summary>
+            It finds the user by userId and calls the boolean isBanned function.
+            </summary>
+            <param name="userId">user id</param>
+            <returns>boolean function IsBanned(user)</returns>
+        </member>
+        <member name="M:Chat.Models.UserUtil.IsBanned(Chat.Models.User)">
+            <summary>
+            It checkes if the user is banned
+            </summary>
+            <param name="user">user</param>
+            <returns>the result</returns>
+            <example>
+            <code>
+             return user.LastLogin.GetValueOrDefault().Equals
+                (DateTime.Parse(
+                    System
+                    .Configuration
+                    .ConfigurationManager
+                    .AppSettings["banDate"]));
+            </code>
+            </example>
+        </member>
+        <member name="M:Chat.Models.UserUtil.SendMail(System.String,System.String)">
+            <summary>
+            Function sends the message to Email via smtpClient.
+            </summary>
+            <param name="sendTo">email adress of the user, who to send </param>
+            <param name="message">text of the message</param>
+        </member>
+    </members>
+</doc>

@@ -12,10 +12,24 @@ using System.Diagnostics;
 
 namespace Chat.Controllers
 {
+    /// <summary>
+    /// The main <c>HomeController</c> class. 
+    /// Contains all methods for back-end
+    /// </summary>
+    /// <remarks>
+    /// This class can auth, logout, addPost, addTheme, editUser etc.
+    /// </remarks>
     public class HomeController : Controller
     {
         Models.ChatContext chat;
 
+        /// <summary>
+        /// This method is loading Index page with needed DATA
+        /// It checks if there are any sections/themes. If not - it adds "default" sections and themes and saves changes
+        /// </summary>
+        /// <returns>
+        /// nothing
+        /// </returns>
         public ActionResult Index()
         {
             if (Models.ChatContext.Context == null)
@@ -184,6 +198,19 @@ namespace Chat.Controllers
             return View();
         }
 
+        /// <summary>
+        /// This method is an auth method that provides auth and if success - redirectToRoute
+        /// it checks if user is not banned and set his lastLogin to current time
+        /// and set sessionUserId to current user.Id
+        /// </summary>
+        /// <param name="authData">Authdata (login/pass) to auth</param>
+        /// <returns>RedirectToRoute to HomePage</returns>
+        /// <example>
+        /// <code>
+        /// user.LastLogin = DateTime.Now;
+        /// Models.ChatContext.Context.SaveChanges();
+        /// </code>
+        /// </example>
         public ActionResult Auth(Models.AuthData authData)
         {
             Models.User user = Models.UserUtil.GetUser(authData);
@@ -210,6 +237,17 @@ namespace Chat.Controllers
                 });
         }
 
+        /// <summary>
+        /// This method is a logout method that redirects u to the homePage
+        /// it sets sessionUserId to null
+        /// then it redirects user to the homePage
+        /// </summary>
+        /// <returns>nothing</returns>
+        /// <example>
+        /// <code>
+        ///  Session["authUserId"] = null;
+        /// </code>
+        /// </example>
         public ActionResult Logout()
         {
             Session["authUserId"] = null;
@@ -234,6 +272,21 @@ namespace Chat.Controllers
             return View();
         }
 
+        /// <summary>
+        /// This method is an AddPost method that provides sending a post (message) if user is logged in.
+        /// it checkes if the user is not banned, if so - it checks for an empty post, post without theme, author
+        /// if everything is fine it adds Post to the database with the all data
+        /// else it sends the email if u are cited
+        /// </summary>
+        /// <param name="post">Post object</param>
+        /// <returns>redirectToRoute to the theme</returns>
+        /// <example>
+        /// <code>
+        ///  post.CreateDT = DateTime.Now;
+        ///   chat.Posts.Add(post);
+        ///   chat.SaveChanges();
+        /// </code>
+        /// </example>
         public RedirectToRouteResult AddPost(Models.Post post)
         {
             
@@ -351,6 +404,10 @@ namespace Chat.Controllers
             
         }
 
+        /// <summary>
+        /// Contact page method
+        /// </summary>
+        /// <returns>View</returns>
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
@@ -358,6 +415,10 @@ namespace Chat.Controllers
             return PartialView();
         }
 
+        /// <summary>
+        /// Registration Page
+        /// </summary>
+        /// <returns>View</returns>
         public ActionResult Registration()
         {
             ViewBag.Message = "Registration page.";
@@ -365,6 +426,19 @@ namespace Chat.Controllers
             return View();
         }
 
+        /// <summary>
+        /// This method is for new user registration
+        /// it generates passHash for a password+salt and if all fields are filled it adds data to the database (creates new user)
+        /// </summary>
+        /// <param name="user">user that wants to register</param>
+        /// <returns>View</returns>
+        /// <example>
+        /// <code>
+        /// Models.ChatContext chat = new Models.ChatContext();
+        /// chat.Users.Add(user);
+        /// chat.SaveChanges();
+        /// </code>
+        /// </example>
         public ActionResult RegUser(Models.User user)
         {
             if (!String.IsNullOrEmpty(user.Login))
@@ -393,6 +467,10 @@ namespace Chat.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Cabinet page method
+        /// </summary>
+        /// <returns>View</returns>
         public ViewResult Cabinet()
         {
             if( Session["authUserId"] == null )
@@ -410,6 +488,13 @@ namespace Chat.Controllers
             return View();
         }
 
+        /// <summary>
+        /// This method provides user data editing.
+        /// it checkes if session[id] is not null.
+        /// and if new fields are not empty it allows to edit the user data.
+        /// </summary>
+        /// <param name="user">user itself</param>
+        /// <returns>RedirectToRoute to cabinet</returns>
         public ActionResult EditUser(Models.User user)
         {
             // Проверка авторизации
@@ -478,6 +563,24 @@ namespace Chat.Controllers
             return RedirectToRoute(new { action = "Cabinet" });
         }
 
+        /// <summary>
+        /// This method provides adding themes to the new or existing section.
+        /// It returns errCode if there are any errors.
+        /// Then it adds needed section, theme and post itself
+        /// </summary>
+        /// <param name="section">section name</param>
+        /// <param name="theme">theme name</param>
+        /// <param name="description">description</param>
+        /// <param name="secDescription">second description</param>
+        /// <returns>errorCode if something is wrong or addTheme()</returns>
+        /// <example>
+        /// <code>
+        /// if (String.IsNullOrEmpty(section))     return "-1";
+        /// if (String.IsNullOrEmpty(theme))       return "-2";
+        /// if (Session["authUserId"] == null)     return "-3";
+        /// if (String.IsNullOrEmpty(description)) return "-4";
+        /// </code>
+        /// </example>
         public String AddTheme(String section, String theme, String description, String secDescription)
         {
             if (String.IsNullOrEmpty(section))     return "-1";
@@ -518,7 +621,7 @@ namespace Chat.Controllers
                         Id_Section = sec_id,
                         CreateDT = DateTime.Now,
                         Description = description
-                        // ✔ Д.З. Добавить к передаваемы данным описание темы (description)
+                        
                     }
                 );
                 Models.ChatContext.Context.SaveChanges();
@@ -548,6 +651,18 @@ namespace Chat.Controllers
             //return sec_id.ToString();
         }
 
+        /// <summary>
+        /// This method is checking if an email is Valid
+        /// It checks if the email is notnullorWhiteSpace and checks for Regex.IsMatch in a try..catch section
+        /// </summary>
+        /// <param name="email">email itself</param>
+        /// <returns>the result (true/false)</returns>
+        /// <example>
+        /// <code>
+        /// if (string.IsNullOrWhiteSpace(email))
+        ///        return false;
+        /// </code>
+        /// </example>
         public static bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))

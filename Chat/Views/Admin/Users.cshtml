@@ -20,7 +20,7 @@
             <th>Сообщений</th>
             <th>Тем</th>
             <th>Разделов</th>
-            <th>Последнее сообщение</th>
+            @*<th>Последнее сообщение</th>*@
             
             <th>Индекс цитирования</th>
         </tr>
@@ -46,10 +46,10 @@
                 <td>@udata.postCnt</td>
                 <td>@udata.themeCnt</td>
                 <td>@udata.secCnt</td>
-                <td>@if (udata.lastPost != null) {
+                @*<td>@if (udata.lastPost != null) {
                     <span title="@udata.lastPost.Message">@udata.lastPost.Message
                     </span>
-                }</td>
+                }</td>*@
                 
                 <td>@udata.cites</td>
             </tr>

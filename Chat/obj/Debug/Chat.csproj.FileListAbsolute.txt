@@ -90,3 +90,4 @@ C:\Users\pwnzst\Desktop\Chat\Chat\obj\Debug\Chat.csprojResolveAssemblyReference.
 C:\Users\pwnzst\Desktop\Chat\Chat\obj\Debug\Chat.csproj.CoreCompileInputs.cache
 C:\Users\pwnzst\Desktop\Chat\Chat\obj\Debug\Chat.dll
 C:\Users\pwnzst\Desktop\Chat\Chat\obj\Debug\Chat.pdb
+C:\Users\pwnzst\Desktop\Chat\Chat\bin\ForumDocumentation.xml
